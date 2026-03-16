@@ -1,4 +1,4 @@
-name: Build and Push Backend Image
+name: Build and Push Docker Images
 
 on:
   push:
@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 env:
-  IMAGE_NAME: hemaswathi2002/three-tier-app
+  BACKEND_IMAGE: hemaswathi2002/three-tier-backend
+  FRONTEND_IMAGE: hemaswathi2002/three-tier-frontend
 
 jobs:
   build-and-push:
@@ -20,7 +21,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Set up QEMU (for multi-arch builds, optional)
+      - name: Set up QEMU (optional for multi-arch)
         uses: docker/setup-qemu-action@v3
 
       - name: Login to Docker Hub
@@ -29,12 +30,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # ---------------- BACKEND ----------------
+
       - name: Build and push backend image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           push: true
-          latforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+
+      # ---------------- FRONTEND ----------------
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:latest
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
