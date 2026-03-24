@@ -1,4 +1,4 @@
-const API_URL = 'http://backend:8080/api/v1/employees';
+const API_URL = 'http://localhost:8080/api/v1/employees';
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchEmployees();
